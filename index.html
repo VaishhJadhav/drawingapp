@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Drawing App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            /* font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; */
+        }
+
+        #canvas-container {
+            text-align: center;
+            /* padding: 5px 10px;
+            margin: 30px 0; */
+        }
+
+        canvas {
+            border: 5px solid #000;
+        }
+
+        #controls {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        button {
+            margin: 0 10px;
+            /* width: 100px; */
+            padding: 5px 10px;
+            cursor: pointer;
+            /* text-align: center; */
+        }
+
+        input[type="color"] {
+            margin-left: 10px;
+        }
+
+        input[type="range"] {
+            margin-left: 10px;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <!-- <div> -->
+        <button id="clear-button">Clear</button>
+        <button id="draw-button">Draw</button>
+        <button id="erase-button">Erase</button>
+        <input type="color" id="color-picker" value="#000000">
+        <input type="range" id="brush-size" min="1" max="20" value="2">
+    <!-- </div> -->
+</div>
+
+    <div id="canvas-container">
+        <canvas id="drawingCanvas" width="800" height="400"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const context = canvas.getContext('2d');
+        const clearButton = document.getElementById('clear-button');
+        const drawButton = document.getElementById('draw-button');
+        const eraseButton = document.getElementById('erase-button');
+        const colorPicker = document.getElementById('color-picker');
+        // const colorPicker = document.getElementById('color-picker');
+        const brushSizeInput = document.getElementById('brush-size');
+        let isDrawing = false;
+        let isErasing = false;
+
+        clearButton.addEventListener('click', () => {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        drawButton.addEventListener('click', () => {
+            isErasing = false;
+        });
+
+        eraseButton.addEventListener('click', () => {
+            isErasing = true;
+        });
+
+        colorPicker.addEventListener('input', () => {
+            context.strokeStyle = colorPicker.value;
+        });
+
+        brushSizeInput.addEventListener('input', () => {
+            const size = parseInt(brushSizeInput.value);
+            context.lineWidth = size;
+        });
+
+        canvas.addEventListener('mousedown', () => {
+            isDrawing = true;
+            context.beginPath();
+        });
+
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+            context.closePath();
+        });
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            if (isErasing) {
+                context.globalCompositeOperation = 'destination-out';
+            } else {
+                context.globalCompositeOperation = 'source-over';
+            }
+
+            context.lineCap = 'round';
+            context.lineTo(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
+            context.stroke();
+        }
+    </script> 
+</body>
+</html>
